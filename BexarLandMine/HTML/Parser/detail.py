@@ -11,8 +11,13 @@ class DetailPageHTMLParser(HTMLParser):
         return "DetailPageHTMLParser()"
 
     def handle_starttag(self, tag, attrs):
+        if tag == 'script':
+            return
         node = HTMLNode(tag)
         if not self.html_node:
             self.html_node = node
         else:
             self.html_node.children.append(node)
+
+    def handle_data(self, data):
+        print(data)
