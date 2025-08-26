@@ -1,5 +1,6 @@
 # Results list page, this is the actual page that we are targeting.
 bexar_list_url = "https://bexar.acttax.com/act_webdev/bexar/showlist.jsp"
+bexar_details_url = "https://bexar.acttax.com/act_webdev/bexar/showdetail2.jsp"
 
 [headers]
 
@@ -7,5 +8,5 @@ bexar_list_url = "https://bexar.acttax.com/act_webdev/bexar/showlist.jsp"
 user-agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
 content-type = "application/x-www-form-urlencoded"
 accept = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
-referer = "https://bexar.acttax.com/act_webdev/bexar/index.jsp"
+referer = "https://bexar.acttax.com/act_webdev/bexar/showlist.jsp"
 
