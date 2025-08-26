@@ -10,3 +10,5 @@ url = f"{conf.data["bexar_details_url"]}?{data}"
 print(f"Getting: {url}")
 res = post(url, headers=conf.data["headers"], data=data)
 p.feed(res.text)
+for n in p.html_node.children:
+    print(n.tag)
