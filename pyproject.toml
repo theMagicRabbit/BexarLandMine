@@ -1,0 +1,15 @@
+[build-system]
+requires = ["hatchling >= 1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "BexarLandMine"
+version = "0.0.1"
+description = "Tool to mine the Bexar County Property Tax records"
+readme = "README.md"
+requires-python = ">=3.9"
+
+[tool.pytest.ini_options]
+addopts = [
+    "--import-mode=importlib",
+]

@@ -1,7 +1,8 @@
-class HTMLNode():
-    def __init__(self, tag: str):
-        self.tag = tag
-        self.children = []
+from .htmlnode import HTMLNode, LeafNode, ParentNode
 
-    def __repr__(self):
-        return "HTMLNode()"
+
+__all__ = [
+        "HTMLNode",
+        "LeafNode",
+        "ParentNode"
+        ]

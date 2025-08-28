@@ -1,7 +1,6 @@
-from .resultlist import ResultListHTMLParser
-from .detail import DetailPageHTMLParser
+from .parser import BexarHTMLParser
+
 
 __all__ = [
-        "ResultListHTMLParser",
-        "DetailPageHTMLParser"
+        "BexarHTMLParser"
         ]
