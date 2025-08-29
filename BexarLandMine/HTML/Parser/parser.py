@@ -46,7 +46,9 @@ class BexarHTMLParser(HTMLParser):
             print("tag stack is empty and should not be")
             raise
         if pop_tag != tag:
-            raise ValueError("passed tag not top of stack")
+            self.tag_stack.append(pop_tag)
+            return
+            # raise ValueError("passed tag not top of stack")
         try:
             children_list = self.children_nodes.pop()
         except IndexError:
