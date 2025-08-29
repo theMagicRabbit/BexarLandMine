@@ -3,6 +3,22 @@ from BexarLandMine.HTML.Node import ParentNode, LeafNode
 
 
 class BexarHTMLParser(HTMLParser):
+    void_tags = [
+        "area",
+        "base",
+        "br",
+        "col",
+        "embed",
+        "hr",
+        "img",
+        "input",
+        "link",
+        "meta",
+        "param",
+        "source",
+        "track",
+        "wbr"]
+
     def __init__(self):
         self.tag_stack = []
         self.node_stack = []
@@ -18,6 +34,8 @@ class BexarHTMLParser(HTMLParser):
         super().feed(cleaned)
 
     def handle_starttag(self, tag, attrs):
+        if tag in self.void_tags:
+            return
         self.tag_stack.append(tag)
         self.children_nodes.append([])
 
@@ -46,6 +64,9 @@ class BexarHTMLParser(HTMLParser):
             return
         self.root_node = node
 
+    def handle_startendtag(self, tag, attrs):
+        return
+
     def handle_data(self, data):
         node = LeafNode(None, data)
         if len(self.tag_stack):
@@ -58,9 +79,6 @@ class BexarHTMLParser(HTMLParser):
             self.children_nodes.append(sibling_nodes)
             return
         self.root_node = node
-
-    def handle_startendtag(self, tag, attrs):
-        return
 
     def handle_comment(self, data):
         return
