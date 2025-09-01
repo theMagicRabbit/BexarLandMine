@@ -49,6 +49,9 @@ class Detail():
     def __repr__(self):
         return f"Detail({self._account_number})"
 
+    def __eq__(self, o):
+        return (self._account_number == o._account_number)
+
 
 def filter_account_num(node):
     return (node.tag == 'div'
