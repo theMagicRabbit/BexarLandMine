@@ -1,6 +1,6 @@
 import logging
 from BexarLandMine.HTML.Node import HTMLNode
-from datatime import date
+from datetime import date
 
 logger = logging.getLogger(__name__)
 
