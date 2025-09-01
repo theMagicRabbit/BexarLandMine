@@ -13,7 +13,7 @@ class Detail():
     """
 
     def __init__(self, account_number: int):
-        self.account_number: int = account_number
+        self._account_number: int = account_number
         self.owner_address: str = ""
         self.property_address: str = ""
         self.legal_description: str = ""
@@ -37,8 +37,17 @@ class Detail():
     def total_ammount_due(self):
         return self.current_amount_due + self.delinquent_amount_due
 
+    def account_number(self):
+        """Pad the account number for web
+
+        The ACT Tax site uses a 12 digit number padded with zeros as the 'can'
+        or (to my best guess) 'County Account Number.' Before passing the
+        account_number to the website, it needs to be padded into a string.
+        """
+        return f"{self._account_number:012}"
+
     def __repr__(self):
-        return "Detail()"
+        return f"Detail({self._account_number})"
 
 
 def filter_account_num(node):
@@ -67,7 +76,8 @@ def detail_from_html_node(html_node: HTMLNode) -> Detail:
         if filter_account_num(node):
             account_number_node = node
             break
-    logger.debug(f"account_number_node: {account_number_node}")
-    account_number = 0
+    if account_number_node:
+        logger.debug(f"account_number_node: {account_number_node}")
+        account_number = int(account_number_node.children[1].value)
     detail = Detail(account_number)
     return detail

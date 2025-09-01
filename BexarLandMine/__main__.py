@@ -18,7 +18,8 @@ def main():
     logger.info(f"Getting: {url}")
     res = post(url, headers=conf.data["headers"], data=data)
     p.feed(res.text)
-    detail_from_html_node(p.root_node)
+    d = detail_from_html_node(p.root_node)
+    print(d)
 
 
 if __name__ == '__main__':
