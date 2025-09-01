@@ -17,6 +17,11 @@ class HTMLNode():
             return False
         return True
 
+    def __iter__(self):
+        yield self
+        for child in self.children:
+            yield from child.__iter__()
+
 
 class ParentNode(HTMLNode):
     def __init__(self, tag, children):
