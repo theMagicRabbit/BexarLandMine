@@ -62,17 +62,27 @@ def filter_account_num(node):
             )
 
 
+def find_html_body(html_node: HTMLNode) -> HTMLNode:
+    """Find the body node in an html document
+
+    Since the data should be in the body node and the body node should be
+    a direct desendant of the top level html node, we can cut down on some
+    remove some of the other high level nodes and save some processing time.
+    """
+    for node in html_node.children:
+        if node.tag == 'body':
+            return node
+    raise ValueError("Body node not found")
+
+
 def detail_from_html_node(html_node: HTMLNode) -> Detail:
     """Creates a detail instance from html node of property detail page"""
-    body_node = None
     account_number_node = None
-    for child in html_node.children:
-        if child.tag != 'body':
-            continue
-        body_node = child
 
-    if not body_node:
-        raise ValueError("No body node found in html")
+    try:
+        body_node = find_html_body(html_node)
+    except ValueError:
+        body_node = html_node
 
     for node in body_node:
         logger.debug(f"Checking for 'label' tag: {node}")
