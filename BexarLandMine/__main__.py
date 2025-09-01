@@ -18,9 +18,7 @@ def main():
     logger.info(f"Getting: {url}")
     res = post(url, headers=conf.data["headers"], data=data)
     p.feed(res.text)
-    for node in p.root_node:
-        print(node)
-    #detail_from_html_node(p.root_node)
+    detail_from_html_node(p.root_node)
 
 
 if __name__ == '__main__':
