@@ -43,6 +43,15 @@ class Detail():
 
 def detail_from_html_node(html_node: HTMLNode) -> Detail:
     """Creates a detail instance from html node of property detail page"""
+    body_node = None
+    for child in html_node.children:
+        if child.tag != 'body':
+            continue
+        body_node = child
+
+    if not body_node:
+        raise ValueError("No body node found in html")
+    logger.debug([child.tag for child in body_node.children])
     account_number = 0
     detail = Detail(account_number)
     return detail
