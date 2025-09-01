@@ -5,7 +5,7 @@ class HTMLNode():
         self.children = children
 
     def __repr__(self):
-        return (f"HTMLNode(tag={self.tag}, value={self.value},"
+        return (f"HTMLNode(tag='{self.tag}', value='{self.value}', "
                 f"children={self.children})")
 
     def __eq__(self, o):
