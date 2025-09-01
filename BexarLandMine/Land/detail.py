@@ -41,6 +41,16 @@ class Detail():
         return "Detail()"
 
 
+def find_node_from_filter(node, filter):
+    if filter(node):
+        return node
+    for child in node.children:
+        result = find_node_from_filter(node, filter)
+        if result:
+            return result
+    return None
+
+
 def detail_from_html_node(html_node: HTMLNode) -> Detail:
     """Creates a detail instance from html node of property detail page"""
     body_node = None
@@ -51,7 +61,17 @@ def detail_from_html_node(html_node: HTMLNode) -> Detail:
 
     if not body_node:
         raise ValueError("No body node found in html")
-    logger.debug([child.tag for child in body_node.children])
+
+    def filter_account_num(n):
+        return (n.tag == 'div'
+                and len(n.children) == 2
+                and n.children[0].tag == 'lable'
+                and len(n.children[0].children) == 1
+                and n.children[0].chilren[0].value == 'Account Number:'
+                )
+
+    node_account_num = find_node_from_filter(body_node, filter_account_num)
+    logger.debug([child.tag for child in node_account_num.children])
     account_number = 0
     detail = Detail(account_number)
     return detail
