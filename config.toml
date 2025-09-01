@@ -10,3 +10,5 @@ content-type = "application/x-www-form-urlencoded"
 accept = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
 referer = "https://bexar.acttax.com/act_webdev/bexar/showlist.jsp"
 
+[output]
+logfile = "bexarlandmine.log"
