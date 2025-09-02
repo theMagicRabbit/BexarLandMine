@@ -11,9 +11,24 @@ class Detail():
     This should not be created directly. The constructor creates only an empty
     instance. Instead use the detail_from_html_node to instantiate instances.
     """
+    node_filters = [
+            (
+                'account_number_node',
+                'Account Number:'
+            ),
+            (
+                'owner_address_node',
+                'Address:'
+            ),
+            (
+                'property_address_node',
+                'Property Site Address:'
+            ),
+        ]
 
-    def __init__(self, account_number: int):
-        self._account_number: int = account_number
+    def __init__(self, detail_html: HTMLNode):
+        data_nodes: dict[str, HTMLNode] = {}
+        self._account_number: int = 0
         self.owner_address: str = ""
         self.property_address: str = ""
         self.legal_description: str = ""
@@ -33,6 +48,24 @@ class Detail():
         self.current_exemptions: str = ""
         self.current_jurisdictions: str = ""
         logger.debug("Detail instance created")
+        try:
+            body_node = find_html_body(detail_html)
+        except ValueError:
+            body_node = detail_html
+
+        for key, search_str in self.node_filters:
+            for node in body_node:
+                if filter_detail_table(node, search_str):
+                    data_nodes[key] = node
+                    break
+        for key, node in data_nodes.items():
+            match key:
+                case 'account_number_node':
+                    self._account_number = int(node.children[1].value)
+                case 'owner_address_node':
+                    self.owner_address = node.children[1].value
+                case 'property_address_node':
+                    self.property_address = node.children[1].value
 
     def total_ammount_due(self):
         return self.current_amount_due + self.delinquent_amount_due
@@ -75,53 +108,3 @@ def find_html_body(html_node: HTMLNode) -> HTMLNode:
     raise ValueError("Body node not found")
 
 
-def detail_from_html_node(html_node: HTMLNode) -> Detail:
-    """Creates a detail instance from html node of property detail page"""
-    data_nodes: dict[str, HTMLNode] = {}
-    node_filters = [
-            (
-                'account_number_node',
-                'Account Number:'
-            ),
-            (
-                'account_address_node',
-                'Address:'
-            ),
-            (
-                'property_address_node',
-                'Property Site Address:'
-            ),
-        ]
-
-    try:
-        body_node = find_html_body(html_node)
-    except ValueError:
-        body_node = html_node
-
-    for key, search_str in node_filters:
-        for node in body_node:
-            if filter_detail_table(node, search_str):
-                data_nodes[key] = node
-                break
-
-    detail = None
-    account_number = None
-    account_address = None
-    property_address = None
-
-    for key, node in data_nodes.items():
-        match key:
-            case 'account_number_node':
-                account_number = int(node.children[1].value)
-            case 'account_address_node':
-                account_address = node.children[1].value
-            case 'property_address_node':
-                property_address = node.children[1].value
-
-    if account_number:
-        detail = Detail(account_number)
-        if account_address:
-            detail.owner_address = account_address
-        if property_address:
-            detail.property_address = property_address
-    return detail
