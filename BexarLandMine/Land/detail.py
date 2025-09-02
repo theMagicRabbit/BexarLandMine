@@ -53,24 +53,6 @@ class Detail():
         return (self._account_number == o._account_number)
 
 
-def filter_account_num(node):
-    return (node.tag == 'div'
-            and len(node.children) == 2
-            and 'label' == node.children[0].tag
-            and len(node.children[0].children) == 1
-            and node.children[0].children[0].value == 'Account Number:'
-            )
-
-
-def filter_account_address(node):
-    return (node.tag == 'div'
-            and len(node.children) == 2
-            and node.children[0].tag == 'label'
-            and len(node.children[0].children) == 1
-            and node.children[0].children[0].value == 'Address:'
-            )
-
-
 def filter_detail_table(node, filter_str):
     return (node.tag == 'div'
             and len(node.children) == 2
