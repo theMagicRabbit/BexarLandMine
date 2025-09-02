@@ -2,7 +2,7 @@ import logging
 from requests import post
 from BexarLandMine.Config import Config
 from BexarLandMine.HTML.Parser import BexarHTMLParser
-from BexarLandMine.Land import detail_from_html_node
+from BexarLandMine.Land import Detail
 logger = logging.getLogger(__name__)
 
 
@@ -18,7 +18,7 @@ def main():
     logger.info(f"Getting: {url}")
     res = post(url, headers=conf.data["headers"], data=data)
     p.feed(res.text)
-    d = detail_from_html_node(p.root_node)
+    d = Detail(p.root_node)
     print(d)
 
 

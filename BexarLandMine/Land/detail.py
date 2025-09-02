@@ -24,6 +24,66 @@ class Detail():
                 'property_address_node',
                 'Property Site Address:'
             ),
+            (
+                'legal_description_node',
+                'Legal Description:'
+            ),
+            (
+                'current_year_tax_levy_node',
+                '2024 Year Tax Levy:'
+            ),
+            (
+                'current_year_amount_due_node',
+                '2024 Year Amount Due:'
+            ),
+            (
+                'delinquent_amount_due_node',
+                'Prior Year(s) Amount Due:'
+            ),
+            (
+                'last_payment_amount_node',
+                'Last Payment Amount Received:'
+            ),
+            (
+                'last_payer_node',
+                'Last Payer:'
+            ),
+            (
+                'last_payment_amount_node',
+                'Last Payment Date:'
+            ),
+            (
+                'is_payment_pending_node',
+                'Pending Credit Card or eCheck Payments:'
+            ),
+            (
+                'total_market_value_node',
+                'Total Market Value:'
+            ),
+            (
+                'land_value_node',
+                'Land Value:'
+            ),
+            (
+                'improvement_value_node',
+                'Improvement Value:'
+            ),
+            (
+                'capped_value_node',
+                'Capped Value:'
+            ),
+            (
+                'ag_value_node',
+                'Agricultural Value:'
+            ),
+            (
+                'current_exemptions_node',
+                'Exemptions (current year only):'
+            ),
+            (
+                'current_jurisdictions_node',
+                'Jurisdictions (current year only):'
+            )
         ]
 
     def __init__(self, detail_html: HTMLNode):
@@ -33,8 +93,8 @@ class Detail():
         self.property_address: str = ""
         self.legal_description: str = ""
         self.current_year: int = 0
-        self.current_tax_levy: float = 0.0
-        self.current_amount_due: float = 0.0
+        self.current_year_tax_levy: float = 0.0
+        self.current_year_amount_due: float = 0.0
         self.current_due_date: date = date.today()
         self.delinquent_amount_due: float = 0.0
         self.last_payment_amount: float = 0.0
@@ -66,6 +126,34 @@ class Detail():
                     self.owner_address = node.children[1].value
                 case 'property_address_node':
                     self.property_address = node.children[1].value
+                case 'legal_description_node':
+                    self.legal_description = node.children[1].value
+                case 'current_year_tax_levy_node':
+                    self.current_year_tax_levy = float(node.children[1].value.removeprefix('$'))
+                case 'current_year_amount_due_node':
+                    self.current_year_amount_due = float(node.children[1].value.removeprefix('$'))
+                case 'delinquent_amount_due_node':
+                    self.delinquent_amount_due = float(node.children[1].value.removeprefix('$'))
+                case 'last_payment_amount_node':
+                    self.last_payment_amount = float(node.children[1].value.removeprefix('$'))
+                case 'last_payer_node':
+                    self.last_payer = node.children[1].value
+                case 'last_payment_date_node':
+                    self.last_payment_date = date(node.children[1].value)
+                case 'is_payment_pending_node':
+                    self.is_payment_pending = bool(node.children[1].value)
+                case 'total_market_value_node':
+                    self.total_market_value = float(node.children[1].value.removeprefix('$'))
+                case 'land_value_node':
+                    self.land_value = float(node.children[1].value.removeprefix('$'))
+                case 'ag_value_node':
+                    self.ag_value = float(node.children[1].value.removeprefix('$'))
+                case 'current_exemptions_node':
+                    self.current_exemptions = node.children[1].value
+                case 'current_jurisdictions_node':
+                    self.current_jurisdictions = node.children[1].value
+                case _:
+                    raise ValueError(f"Unknown key: {key}")
 
     def total_ammount_due(self):
         return self.current_amount_due + self.delinquent_amount_due
