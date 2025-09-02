@@ -62,6 +62,24 @@ def filter_account_num(node):
             )
 
 
+def filter_account_address(node):
+    return (node.tag == 'div'
+            and len(node.children) == 2
+            and node.children[0].tag == 'label'
+            and len(node.children[0].children) == 1
+            and node.children[0].children[0].value == 'Address:'
+            )
+
+
+def filter_detail_table(node, filter_str):
+    return (node.tag == 'div'
+            and len(node.children) == 2
+            and node.children[0].tag == 'label'
+            and len(node.children[0].children) == 1
+            and node.children[0].children[0].value == filter_str
+            )
+
+
 def find_html_body(html_node: HTMLNode) -> HTMLNode:
     """Find the body node in an html document
 
@@ -77,20 +95,51 @@ def find_html_body(html_node: HTMLNode) -> HTMLNode:
 
 def detail_from_html_node(html_node: HTMLNode) -> Detail:
     """Creates a detail instance from html node of property detail page"""
-    account_number_node = None
+    data_nodes: dict[str, HTMLNode] = {}
+    node_filters = [
+            (
+                'account_number_node',
+                'Account Number:'
+            ),
+            (
+                'account_address_node',
+                'Address:'
+            ),
+            (
+                'property_address_node',
+                'Property Site Address:'
+            ),
+        ]
 
     try:
         body_node = find_html_body(html_node)
     except ValueError:
         body_node = html_node
 
-    for node in body_node:
-        logger.debug(f"Checking for 'label' tag: {node}")
-        if filter_account_num(node):
-            account_number_node = node
-            break
-    if account_number_node:
-        logger.debug(f"account_number_node: {account_number_node}")
-        account_number = int(account_number_node.children[1].value)
-    detail = Detail(account_number)
+    for key, search_str in node_filters:
+        for node in body_node:
+            if filter_detail_table(node, search_str):
+                data_nodes[key] = node
+                break
+
+    detail = None
+    account_number = None
+    account_address = None
+    property_address = None
+
+    for key, node in data_nodes.items():
+        match key:
+            case 'account_number_node':
+                account_number = int(node.children[1].value)
+            case 'account_address_node':
+                account_address = node.children[1].value
+            case 'property_address_node':
+                property_address = node.children[1].value
+
+    if account_number:
+        detail = Detail(account_number)
+        if account_address:
+            detail.owner_address = account_address
+        if property_address:
+            detail.property_address = property_address
     return detail
