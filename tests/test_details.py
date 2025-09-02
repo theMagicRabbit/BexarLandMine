@@ -1,5 +1,5 @@
 from BexarLandMine.HTML.Node import HTMLNode
-from BexarLandMine.Land import filter_detail_table, Detail, detail_from_html_node
+from BexarLandMine.Land import filter_detail_table, Detail
 
 
 def test_filters():
@@ -100,11 +100,10 @@ def test_details():
                 ]),
                 HTMLNode(tag=None, value='000000000001', children=[])
             ]),
-            (Detail(1), '000000000001')
+            '000000000001'
         ),
     ]
     for input, expected in tests:
-        node, can = expected
-        result = detail_from_html_node(input)
-        assert result == node
+        can = expected
+        result = Detail(input)
         assert result.account_number() == can
