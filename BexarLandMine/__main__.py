@@ -2,6 +2,7 @@ import logging
 from requests import post
 from BexarLandMine.Config import Config
 from BexarLandMine.HTML.Parser import BexarHTMLParser
+from BexarLandMine.Land import Detail
 logger = logging.getLogger(__name__)
 
 
@@ -17,7 +18,12 @@ def main():
     logger.info(f"Getting: {url}")
     res = post(url, headers=conf.data["headers"], data=data)
     p.feed(res.text)
-    print(p.root_node)
+    try:
+        d = Detail(p.root_node)
+    except ValueError as e:
+        print(e)
+    else:
+        print(d)
 
 
 if __name__ == '__main__':

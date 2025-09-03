@@ -82,8 +82,11 @@ class BexarHTMLParser(HTMLParser):
         return
 
     def handle_data(self, data):
-        node = LeafNode(None, data)
-        if len(self.tag_stack):
+        cleaned = data.strip()
+        node = LeafNode(None, cleaned)
+        if not cleaned:
+            node = None
+        if len(self.tag_stack) and node:
             try:
                 sibling_nodes = self.children_nodes.pop()
             except IndexError:
