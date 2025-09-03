@@ -104,6 +104,7 @@ class Detail():
         self.total_market_value: float = 0.0
         self.land_value: float = 0.0
         self.improvement_value: float = 0.0
+        self.capped_value: float = 0.0
         self.ag_value: float = 0.0
         self.current_exemptions: str = ""
         self.current_jurisdictions: str = ""
@@ -135,7 +136,12 @@ class Detail():
                 case 'delinquent_amount_due_node':
                     self.delinquent_amount_due = float(node.children[1].value.removeprefix('$'))
                 case 'last_payment_amount_node':
-                    self.last_payment_amount = float(node.children[1].value.removeprefix('$'))
+                    payment_str = node.children[1].value
+                    if payment_str == 'Not Received':
+                        pass
+                    else:
+                        self.last_payment_amount = float(payment_str
+                                                         .removeprefix('$'))
                 case 'last_payer_node':
                     self.last_payer = node.children[1].value
                 case 'last_payment_date_node':
@@ -144,8 +150,12 @@ class Detail():
                     self.is_payment_pending = bool(node.children[1].value)
                 case 'total_market_value_node':
                     self.total_market_value = float(node.children[1].value.removeprefix('$'))
+                case 'improvement_value_node':
+                    self.improvement_value = float(node.children[1].value.removeprefix('$'))
                 case 'land_value_node':
                     self.land_value = float(node.children[1].value.removeprefix('$'))
+                case 'capped_value_node':
+                    self.capped_value = float(node.children[1].value.removeprefix('$'))
                 case 'ag_value_node':
                     self.ag_value = float(node.children[1].value.removeprefix('$'))
                 case 'current_exemptions_node':
@@ -153,6 +163,7 @@ class Detail():
                 case 'current_jurisdictions_node':
                     self.current_jurisdictions = node.children[1].value
                 case _:
+                    breakpoint()
                     raise ValueError(f"Unknown key: {key}")
 
     def total_ammount_due(self):
