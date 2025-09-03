@@ -18,8 +18,12 @@ def main():
     logger.info(f"Getting: {url}")
     res = post(url, headers=conf.data["headers"], data=data)
     p.feed(res.text)
-    d = Detail(p.root_node)
-    print(d)
+    try:
+        d = Detail(p.root_node)
+    except ValueError as e:
+        print(e)
+    else:
+        print(d)
 
 
 if __name__ == '__main__':
