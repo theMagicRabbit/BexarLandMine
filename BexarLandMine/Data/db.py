@@ -48,7 +48,7 @@ class DB():
     def _create_amounts_table(self, cur: sqlite3.Cursor):
         query = """CREATE TABLE IF NOT EXISTS amounts(
                 account_number INTEGER CONSTRAINT fk_amounts_account_number REFERENCES account(account_number),
-                amount_year INTEGER,
+                amount_year INTEGER CONSTRAINT nn_amount_year NOT NULL,
                 amount_cent_year_tax_levy INTEGER,
                 amount_cent_year_amount_due INTEGER,
                 amount_cent_prior_years_due INTEGER,
@@ -62,5 +62,50 @@ class DB():
                 );"""
         return query, cur
 
-    def __repr__(self):
+    @_db_executer
+    def add_owner(self, owner_address: str):
+        cur = self.connection.cursor()
+        query = f"""INSERT INTO owner (owner_name_address)
+        VALUES ('{owner_address}');"""
+        return query, cur
+
+    @_db_executer
+    def add_account(self, account_num: int, owner_id: int,
+                    property_address: str, legal_description: str,
+                    exemptions: str = None, jurisdictions: str = None):
+        cur = self.connection.cursor()
+        if exemptions:
+            exemptions = f"""'{exemptions}'"""
+        if jurisdictions:
+            jurisdictions = f"""'{jurisdictions}'"""
+        query = f"""INSERT INTO account (
+                account_number, owner_id, account_property_address,
+                account_legal_description, account_exemptions,
+                account_jurisdictions)
+        VALUES ({account_num}, {owner_id}, '{property_address}',
+                '{legal_description}', {exemptions}, {jurisdictions});"""
+        return query, cur
+
+    @_db_executer
+    def add_amounts(self, account_num: int, amount_year: int,
+                    cent_year_tax_levy: int, cent_year_amount_due: int,
+                    cent_prior_years_due: int, cent_last_amount_paid: int,
+                    cent_total_market_value: int, cent_land_value: int,
+                    cent_improvement_value: int, cent_capped_value: int,
+                    cent_ag_value: int):
+        cur = self.connection.cursor()
+        query = f"""INSERT INTO amounts (
+                account_number, amount_year, amount_cent_year_tax_levy,
+                amount_cent_year_amount_due, amount_cent_prior_years_due,
+                amount_cent_last_amount_paid, amount_cent_total_market_value,
+                amount_cent_land_value, amount_cent_improvement_value,
+                amount_cent_capped_value, amount_cent_ag_value)
+        VALUES ({account_num}, {amount_year}, {cent_year_tax_levy},
+                {cent_year_amount_due}, {cent_prior_years_due},
+                {cent_last_amount_paid}, {cent_total_market_value},
+                {cent_land_value}, {cent_improvement_value},
+                {cent_capped_value}, {cent_ag_value});"""
+        return query, cur
+
+    def __repr__(self): 
         return f"DB({self._db_file})"
