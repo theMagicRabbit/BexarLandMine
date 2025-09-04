@@ -12,3 +12,4 @@ referer = "https://bexar.acttax.com/act_webdev/bexar/showlist.jsp"
 
 [output]
 logfile = "bexarlandmine.log"
+dbfile = "bexarlandmine.db"

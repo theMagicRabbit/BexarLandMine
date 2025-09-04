@@ -1,6 +1,7 @@
 import logging
 from requests import post
 from BexarLandMine.Config import Config
+from BexarLandMine.Data import DB
 from BexarLandMine.HTML.Parser import BexarHTMLParser
 from BexarLandMine.Land import Detail
 logger = logging.getLogger(__name__)
@@ -24,6 +25,7 @@ def main():
         print(e)
     else:
         print(d)
+    d = DB(conf.data["output"]["dbfile"])
 
 
 if __name__ == '__main__':
