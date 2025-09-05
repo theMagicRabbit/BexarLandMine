@@ -36,7 +36,24 @@ def test_parse_html():
                         ParentNode('div', [
                             LeafNode(None, "This is text in html tags."),
                             ]),])
-            )
+            ),
+            (
+                """
+<div>
+    <label>Address:</label>
+    <br>
+    TEST ACCOUNT<br/>AUDITOR'S OFFICE<br/>SAN ANTONIO, T,TX 10000
+</div>
+""",
+                ParentNode(
+                    'div', [
+                        ParentNode('label', [LeafNode(None, 'Address:'),]),
+                        LeafNode(None, """TEST ACCOUNT
+AUDITOR'S OFFICE
+SAN ANTONIO, T,TX 10000"""),
+                            ]
+                    )
+            ),
         ]
     for input, expected in tests:
         parser = BexarHTMLParser()
