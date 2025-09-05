@@ -50,7 +50,6 @@ class DB():
                 account_number INTEGER CONSTRAINT fk_amounts_account_number REFERENCES account(account_number),
                 amount_year INTEGER CONSTRAINT nn_amount_year NOT NULL,
                 amount_cent_year_tax_levy INTEGER,
-                amount_cent_year_amount_due INTEGER,
                 amount_cent_prior_years_due INTEGER,
                 amount_cent_last_amount_paid INTEGER,
                 amount_cent_total_market_value INTEGER,
@@ -60,6 +59,13 @@ class DB():
                 amount_cent_ag_value INTEGER,
                 CONSTRAINT pk_amounts PRIMARY KEY (account_number, amount_year)
                 );"""
+        return query, cur
+
+    @_db_executer
+    def get_owner(self, owner_address: str):
+        cur = self.connection.cursor()
+        query = f"""SELECT FROM owner
+        WHERE owner_name_address = '{owner_address}';"""
         return query, cur
 
     @_db_executer
@@ -88,7 +94,7 @@ class DB():
 
     @_db_executer
     def add_amounts(self, account_num: int, amount_year: int,
-                    cent_year_tax_levy: int, cent_year_amount_due: int,
+                    cent_year_tax_levy: int,
                     cent_prior_years_due: int, cent_last_amount_paid: int,
                     cent_total_market_value: int, cent_land_value: int,
                     cent_improvement_value: int, cent_capped_value: int,
@@ -96,12 +102,12 @@ class DB():
         cur = self.connection.cursor()
         query = f"""INSERT INTO amounts (
                 account_number, amount_year, amount_cent_year_tax_levy,
-                amount_cent_year_amount_due, amount_cent_prior_years_due,
+                amount_cent_prior_years_due,
                 amount_cent_last_amount_paid, amount_cent_total_market_value,
                 amount_cent_land_value, amount_cent_improvement_value,
                 amount_cent_capped_value, amount_cent_ag_value)
         VALUES ({account_num}, {amount_year}, {cent_year_tax_levy},
-                {cent_year_amount_due}, {cent_prior_years_due},
+                {cent_prior_years_due},
                 {cent_last_amount_paid}, {cent_total_market_value},
                 {cent_land_value}, {cent_improvement_value},
                 {cent_capped_value}, {cent_ag_value});"""
