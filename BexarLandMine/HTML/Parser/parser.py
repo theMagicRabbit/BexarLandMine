@@ -37,7 +37,7 @@ class BexarHTMLParser(HTMLParser):
         return "BexarHTMLParser()"
 
     def feed(self, data: str):
-        cleaned = data.strip()
+        cleaned = data.strip().replace('<br>', "\n").replace('<br/>', "\n")
         super().feed(cleaned)
 
     def handle_starttag(self, tag, attrs):
