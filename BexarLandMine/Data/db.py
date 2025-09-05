@@ -12,9 +12,11 @@ class DB():
             self._create_db_tables()
 
     def _db_executer(query_formatter):
-        def wrapper(*args, **kwargs):
-            sql, cur = query_formatter(*args, **kwargs)
-            return cur.execute(sql)
+        def wrapper(self, *args, **kwargs):
+            sql, cur, values = query_formatter(self, *args, **kwargs)
+            cur.execute(sql, values)
+            self.connection.commit()
+            return
         return wrapper
 
     def _create_db_tables(self):
@@ -30,7 +32,7 @@ class DB():
                 id INTEGER PRIMARY KEY,
                 owner_name_address TEXT
                 );"""
-        return query, cur
+        return query, cur, ()
 
     @_db_executer
     def _create_account_table(self, cur: sqlite3.Cursor):
@@ -42,7 +44,7 @@ class DB():
                 account_exemptions TEXT,
                 account_jurisdictions TEXT
                 );"""
-        return query, cur
+        return query, cur, ()
 
     @_db_executer
     def _create_amounts_table(self, cur: sqlite3.Cursor):
@@ -59,21 +61,23 @@ class DB():
                 amount_cent_ag_value INTEGER,
                 CONSTRAINT pk_amounts PRIMARY KEY (account_number, amount_year)
                 );"""
-        return query, cur
+        return query, cur, ()
 
     @_db_executer
     def get_owner(self, owner_address: str):
         cur = self.connection.cursor()
-        query = f"""SELECT FROM owner
-        WHERE owner_name_address = '{owner_address}';"""
-        return query, cur
+        query = """SELECT id FROM owner
+        WHERE owner_name_address = ? ;"""
+        values = (owner_address,)
+        return query, cur, values
 
     @_db_executer
     def add_owner(self, owner_address: str):
         cur = self.connection.cursor()
-        query = f"""INSERT INTO owner (owner_name_address)
-        VALUES ('{owner_address}');"""
-        return query, cur
+        query = """INSERT INTO owner (owner_name_address)
+        VALUES(?);"""
+        values = (owner_address,)
+        return query, cur, values
 
     @_db_executer
     def add_account(self, account_num: int, owner_id: int,
@@ -84,13 +88,15 @@ class DB():
             exemptions = f"""'{exemptions}'"""
         if jurisdictions:
             jurisdictions = f"""'{jurisdictions}'"""
-        query = f"""INSERT INTO account (
+        query = """INSERT INTO account (
                 account_number, owner_id, account_property_address,
                 account_legal_description, account_exemptions,
                 account_jurisdictions)
-        VALUES ({account_num}, {owner_id}, '{property_address}',
-                '{legal_description}', {exemptions}, {jurisdictions});"""
-        return query, cur
+        VALUES (?, ?, ?, ?, ?, ?);"""
+        values = (account_num, owner_id, property_address, legal_description,
+                  exemptions, jurisdictions)
+        breakpoint()
+        return query, cur, values
 
     @_db_executer
     def add_amounts(self, account_num: int, amount_year: int,
@@ -100,18 +106,18 @@ class DB():
                     cent_improvement_value: int, cent_capped_value: int,
                     cent_ag_value: int):
         cur = self.connection.cursor()
-        query = f"""INSERT INTO amounts (
+        query = """INSERT INTO amounts (
                 account_number, amount_year, amount_cent_year_tax_levy,
                 amount_cent_prior_years_due,
                 amount_cent_last_amount_paid, amount_cent_total_market_value,
                 amount_cent_land_value, amount_cent_improvement_value,
                 amount_cent_capped_value, amount_cent_ag_value)
-        VALUES ({account_num}, {amount_year}, {cent_year_tax_levy},
-                {cent_prior_years_due},
-                {cent_last_amount_paid}, {cent_total_market_value},
-                {cent_land_value}, {cent_improvement_value},
-                {cent_capped_value}, {cent_ag_value});"""
-        return query, cur
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"""
+        values = (account_num, amount_year, cent_year_tax_levy,
+                  cent_prior_years_due, cent_last_amount_paid,
+                  cent_total_market_value, cent_land_value,
+                  cent_improvement_value, cent_capped_value, cent_ag_value)
+        return query, cur, values
 
     def __repr__(self): 
         return f"DB({self._db_file})"
