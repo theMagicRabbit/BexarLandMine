@@ -16,7 +16,7 @@ class DB():
             sql, cur, values = query_formatter(self, *args, **kwargs)
             cur.execute(sql, values)
             self.connection.commit()
-            return
+            return cur
         return wrapper
 
     def _create_db_tables(self):

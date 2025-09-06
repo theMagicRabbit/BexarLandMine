@@ -15,7 +15,7 @@ def main():
     logging.basicConfig(filename=conf.data["output"]["logfile"],
                         level=logging.DEBUG, format=LOG_FORMAT)
     p = BexarHTMLParser()
-    d = DB(conf.data["output"]["dbfile"])
+    db = DB(conf.data["output"]["dbfile"])
     url = f"{conf.data["bexar_details_url"]}?{data}"
     logger.info(f"Getting: {url}")
     res = post(url, headers=conf.data["headers"], data=data)
@@ -26,6 +26,7 @@ def main():
         print(e)
     else:
         print(d)
+    d.write_db(db)
 
 
 if __name__ == '__main__':
