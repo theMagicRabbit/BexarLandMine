@@ -30,7 +30,13 @@ class DB():
     def _create_owner_table(self, cur: sqlite3.Cursor):
         query = """CREATE TABLE IF NOT EXISTS owner(
                 id INTEGER PRIMARY KEY,
-                owner_name_address TEXT
+                account_number INTEGER
+                    CONSTRAINT fk_owner_account_num
+                    REFERENCES account(account_number),
+                owner_year INTEGER,
+                owner_name_address TEXT,
+                CONSTRAINT uk_owner_year_address
+                    UNIQUE (account_number, owner_year, owner_name_address)
                 );"""
         return query, cur, ()
 
@@ -38,7 +44,6 @@ class DB():
     def _create_account_table(self, cur: sqlite3.Cursor):
         query = """CREATE TABLE IF NOT EXISTS account(
                 account_number INTEGER CONSTRAINT pk_account PRIMARY KEY,
-                owner_id INTEGER CONSTRAINT fk_account_owner REFERENCES owner(id),
                 account_property_address TEXT UNIQUE,
                 account_legal_description TEXT UNIQUE,
                 account_exemptions TEXT,
@@ -72,15 +77,17 @@ class DB():
         return query, cur, values
 
     @_db_executer
-    def add_owner(self, owner_address: str):
+    def add_owner(self, account_num: int, year: int, owner_address: str):
         cur = self.connection.cursor()
-        query = """INSERT INTO owner (owner_name_address)
-        VALUES(?);"""
-        values = (owner_address,)
+        query = """INSERT INTO owner(
+                account_number, owner_year, owner_name_address
+                )
+        VALUES(?, ?, ?);"""
+        values = (account_num, year, owner_address)
         return query, cur, values
 
     @_db_executer
-    def add_account(self, account_num: int, owner_id: int,
+    def add_account(self, account_num: int,
                     property_address: str, legal_description: str,
                     exemptions: str = None, jurisdictions: str = None):
         cur = self.connection.cursor()
@@ -89,11 +96,11 @@ class DB():
         if jurisdictions:
             jurisdictions = f"""'{jurisdictions}'"""
         query = """INSERT INTO account (
-                account_number, owner_id, account_property_address,
+                account_number, account_property_address,
                 account_legal_description, account_exemptions,
                 account_jurisdictions)
-        VALUES (?, ?, ?, ?, ?, ?);"""
-        values = (account_num, owner_id, property_address, legal_description,
+        VALUES (?, ?, ?, ?, ?);"""
+        values = (account_num, property_address, legal_description,
                   exemptions, jurisdictions)
         breakpoint()
         return query, cur, values

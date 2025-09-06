@@ -188,16 +188,17 @@ class Detail():
         return self.current_amount_due + self.delinquent_amount_due
 
     def write_db(self, db: DB):
-        db.add_owner(self.owner_address)
-        owner_number_cur = db.get_owner(self.owner_address)
-        if not owner_number_cur:
-            breakpoint()
-            raise ValueError("Owner not in database")
-        owner_number, = owner_number_cur.fetchone()
-        db.add_account(self._account_number, owner_number,
+        # owner_number_cur = db.get_owner(self.owner_address)
+        # if not owner_number_cur:
+        #     breakpoint()
+        #     raise ValueError("Owner not in database")
+        # owner_number, = owner_number_cur.fetchone()
+        db.add_account(self._account_number,
                        self.property_address, self.legal_description,
                        exemptions=self.current_exemptions,
                        jurisdictions=self.current_jurisdictions)
+        db.add_owner(self._account_number, self.current_year,
+                     self.owner_address)
         db.add_amounts(self._account_number, self.current_year,
                        self.current_year_tax_levy, self.delinquent_amount_due,
                        self.last_payment_amount, self.total_market_value,
