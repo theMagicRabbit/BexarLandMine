@@ -24,6 +24,7 @@ class DB():
         self._create_owner_table(cur)
         self._create_account_table(cur)
         self._create_amounts_table(cur)
+        # self._create_invalid_account_table(cur)
         pass
 
     @_db_executer
@@ -44,6 +45,7 @@ class DB():
     def _create_account_table(self, cur: sqlite3.Cursor):
         query = """CREATE TABLE IF NOT EXISTS account(
                 account_number INTEGER CONSTRAINT pk_account PRIMARY KEY,
+                account_valid BOOL,
                 account_property_address TEXT UNIQUE,
                 account_legal_description TEXT UNIQUE,
                 account_exemptions TEXT,
@@ -69,6 +71,28 @@ class DB():
         return query, cur, ()
 
     @_db_executer
+    def _create_invalid_account_table(self, cur: sqlite3.Cursor):
+        query = """CREATE TABLE IF NOT EXISTS invalid_account(
+                invalid_account_number INTEGER CONSTRAINT pk_invalid_account PRIMARY KEY
+                );"""
+        return query, cur, ()
+
+    @_db_executer
+    def get_invalid_account(self, account_number: int):
+        cur = self.connection.cursor()
+        query = """SELECT invalid_account_number FROM invalid_account
+        WHERE invalid_account_number = ?;"""
+        values = (account_number,)
+        return query, cur, values
+
+    @_db_executer
+    def get_last_account_number(self):
+        cur = self.connection.cursor()
+        query = """SELECT account_number FROM account
+        ORDER BY account_number DESC LIMIT 1;"""
+        return query, cur, ()
+
+    @_db_executer
     def get_owner(self, owner_address: str):
         cur = self.connection.cursor()
         query = """SELECT id FROM owner
@@ -87,8 +111,9 @@ class DB():
         return query, cur, values
 
     @_db_executer
-    def add_account(self, account_num: int,
-                    property_address: str, legal_description: str,
+    def add_account(self, account_num: int, valid: bool,
+                    property_address: str = None,
+                    legal_description: str = None,
                     exemptions: str = None, jurisdictions: str = None):
         cur = self.connection.cursor()
         if exemptions:
@@ -96,13 +121,23 @@ class DB():
         if jurisdictions:
             jurisdictions = f"""'{jurisdictions}'"""
         query = """INSERT INTO account (
-                account_number, account_property_address,
+                account_number, account_valid, account_property_address,
                 account_legal_description, account_exemptions,
                 account_jurisdictions)
-        VALUES (?, ?, ?, ?, ?);"""
-        values = (account_num, property_address, legal_description,
+        VALUES (?, ?, ?, ?, ?, ?);"""
+        values = (account_num, valid, property_address, legal_description,
                   exemptions, jurisdictions)
-        breakpoint()
+        return query, cur, values
+
+    @_db_executer
+    def add_invalid_account(self, account_number: int):
+        cur = self.connection.cursor()
+        query = """INSERT INTO account (
+                account_number, account_valid, account_property_address,
+                account_legal_description, account_exemptions,
+                account_jurisdictions)
+        VALUES (?, ?, ?, ?, ?, ?);"""
+        values = (account_number, False, None, None, None, None)
         return query, cur, values
 
     @_db_executer

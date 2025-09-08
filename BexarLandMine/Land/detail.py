@@ -91,15 +91,15 @@ class Detail():
     def __init__(self, detail_html: HTMLNode):
         data_nodes: dict[str, HTMLNode] = {}
         self._account_number: int = 0
-        self.owner_address: str = ""
-        self.property_address: str = ""
-        self.legal_description: str = ""
+        self.owner_address: str = None
+        self.property_address: str = None
+        self.legal_description: str = None
         self.current_year: int = 0
         self.current_year_tax_levy: int = 0
         self.current_due_date: date = date.today()
         self.delinquent_amount_due: int = 0
         self.last_payment_amount: int = 0
-        self.last_payer: str = ""
+        self.last_payer: str = None
         self.last_payment_date: date = date.today()
         self.is_payment_pending: bool = False
         self.total_market_value: int = 0
@@ -107,9 +107,8 @@ class Detail():
         self.improvement_value: int = 0
         self.capped_value: int = 0
         self.ag_value: int = 0
-        self.current_exemptions: str = ""
-        self.current_jurisdictions: str = ""
-        logger.debug("Detail instance created")
+        self.current_exemptions: str = None
+        self.current_jurisdictions: str = None
         try:
             body_node = find_html_body(detail_html)
         except ValueError:
@@ -177,7 +176,6 @@ class Detail():
                 case 'current_jurisdictions_node':
                     self.current_jurisdictions = node.children[1].value
                 case _:
-                    breakpoint()
                     raise ValueError(f"Unknown key: {key}")
 
     def _convert_float_to_cent(self, amount_float: float) -> int:
@@ -187,13 +185,13 @@ class Detail():
     def total_ammount_due(self):
         return self.current_amount_due + self.delinquent_amount_due
 
-    def write_db(self, db: DB):
+    def write_db(self, db: DB, is_valid: bool):
         # owner_number_cur = db.get_owner(self.owner_address)
         # if not owner_number_cur:
         #     breakpoint()
         #     raise ValueError("Owner not in database")
         # owner_number, = owner_number_cur.fetchone()
-        db.add_account(self._account_number,
+        db.add_account(self._account_number, is_valid,
                        self.property_address, self.legal_description,
                        exemptions=self.current_exemptions,
                        jurisdictions=self.current_jurisdictions)

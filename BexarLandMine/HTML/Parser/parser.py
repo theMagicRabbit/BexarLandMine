@@ -1,4 +1,5 @@
 import logging
+from re import compile
 from html.parser import HTMLParser
 from BexarLandMine.HTML.Node import ParentNode, LeafNode
 logger = logging.getLogger(__name__)
@@ -38,6 +39,10 @@ class BexarHTMLParser(HTMLParser):
 
     def feed(self, data: str):
         cleaned = data.strip().replace('<br>', "\n").replace('<br/>', "\n")
+        re_string = r"Test: java\.sql\.SQLException: Invalid account.*"
+        invalid_page_re = compile(re_string)
+        if invalid_page_re.match(cleaned):
+            raise ValueError("account does not exist")
         super().feed(cleaned)
 
     def handle_starttag(self, tag, attrs):
@@ -65,7 +70,7 @@ class BexarHTMLParser(HTMLParser):
             logger.error("children node stack is empty and should not be")
             raise
         node = ParentNode(pop_tag, children_list)
-        logger.debug(node)
+        logger.debug(str(node))
         if len(self.tag_stack):
             try:
                 sibling_nodes = self.children_nodes.pop()
@@ -74,7 +79,6 @@ class BexarHTMLParser(HTMLParser):
                 raise
             sibling_nodes.append(node)
             self.children_nodes.append(sibling_nodes)
-            logger.debug(self.children_nodes)
             return
         self.root_node = node
 
